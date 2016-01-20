@@ -68,8 +68,8 @@ public final class LoadStateView_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        mTextView = ((TextView) hasViews.findViewById(id.load_tv));
         mProgressBar = ((ProgressBar) hasViews.findViewById(id.load_progressBar));
+        mTextView = ((TextView) hasViews.findViewById(id.load_tv));
     }
 
 }

@@ -15,7 +15,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.LinearLayout;
 import com.example.qgrecyclerview.R.id;
 import com.example.qgrecyclerview.R.layout;
 import com.util.recyclerview.CustomRecyclerView;
@@ -77,7 +76,6 @@ public final class TestActivity_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        mLL = ((LinearLayout) hasViews.findViewById(id.test_root_view));
         mRecyclerView = ((CustomRecyclerView) hasViews.findViewById(id.test_recyclerview));
         {
             View view = hasViews.findViewById(id.btn_1);

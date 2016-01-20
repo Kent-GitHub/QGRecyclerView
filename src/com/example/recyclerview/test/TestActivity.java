@@ -45,9 +45,6 @@ public class TestActivity extends Activity {
 	@ViewById(R.id.test_recyclerview)
 	CustomRecyclerView mRecyclerView;
 
-	@ViewById(R.id.test_root_view)
-	LinearLayout mLL;
-	
 	public final int STATE_SUCCEEDED = 1;
 	public final int STATE_FAILED = 2;
 	public final int STATE_NO_MORE_DATAS = 3;

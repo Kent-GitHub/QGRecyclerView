@@ -68,8 +68,8 @@ public final class MyViewGroup2_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        Vg2Content = ((TextView) hasViews.findViewById(id.vg2_content));
         beanIv = ((ImageView) hasViews.findViewById(id.vg2_image));
+        Vg2Content = ((TextView) hasViews.findViewById(id.vg2_content));
         vg2Title = ((TextView) hasViews.findViewById(id.vg2_title));
     }
 
