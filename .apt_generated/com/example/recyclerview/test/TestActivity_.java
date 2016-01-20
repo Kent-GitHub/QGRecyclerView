@@ -77,8 +77,8 @@ public final class TestActivity_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        mRecyclerView = ((CustomRecyclerView) hasViews.findViewById(id.test_recyclerview));
         mLL = ((LinearLayout) hasViews.findViewById(id.test_root_view));
+        mRecyclerView = ((CustomRecyclerView) hasViews.findViewById(id.test_recyclerview));
         {
             View view = hasViews.findViewById(id.btn_1);
             if (view!= null) {

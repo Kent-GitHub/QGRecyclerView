@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.UiThread;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,7 +30,8 @@ import android.widget.Toast;
 
 import com.example.qgrecyclerview.R;
 import com.util.recyclerview.CustomRecyclerView;
-import com.util.recyclerview.CustomRecyclerView.OnRecyclerViewIsBottomListener;
+import com.util.recyclerview.CustomRecyclerView.OnLoadMoreListener;
+import com.util.recyclerview.CustomRecyclerView.OnSubItemCLickListener;
 import com.util.recyclerview.ReViewAdapter;
 import com.util.recyclerview.CustomRecyclerView.OnItemClickListener;
 import com.util.recyclerview.CustomRecyclerView.OnItemLeftScrollListener;
@@ -46,35 +48,37 @@ public class TestActivity extends Activity {
 	@ViewById(R.id.test_root_view)
 	LinearLayout mLL;
 	
-	public  final int STATE_SUCCEEDED=1;
-	public  final int STATE_FAILED=2;
-	public  final int STATE_NO_MORE_DATAS=3;
+	public final int STATE_SUCCEEDED = 1;
+	public final int STATE_FAILED = 2;
+	public final int STATE_NO_MORE_DATAS = 3;
 	
+	private String logTag="TestActivity";
 	private int loadState;
-	
-	@CheckedChange({R.id.test_state1,R.id.test_state2,R.id.test_state3,R.id.test_auto_load})
-	void checkChanged(CompoundButton button,boolean isChecked){
+
+	@CheckedChange({ R.id.test_state1, R.id.test_state2, R.id.test_state3,
+			R.id.test_auto_load })
+	void checkChanged(CompoundButton button, boolean isChecked) {
 		if (isChecked) {
 			switch (button.getId()) {
 			case R.id.test_state1:
-				loadState=1;
+				loadState = 1;
 				break;
 			case R.id.test_state2:
-				loadState=2;
+				loadState = 2;
 				break;
 			case R.id.test_state3:
-				loadState=3;
+				loadState = 3;
 				break;
 			case R.id.test_auto_load:
 				mRecyclerView.setAutoLoadMoreEnable(isChecked);
 			}
-		}else {
-			if (button.getId()==R.id.test_auto_load) {
+		} else {
+			if (button.getId() == R.id.test_auto_load) {
 				mRecyclerView.setAutoLoadMoreEnable(isChecked);
 			}
 		}
 	}
-	
+
 	public static final int TYPE_WITHOUT_BUTTON = 1;
 	public static final int TYPE_WITH_BUTTON = 2;
 
@@ -85,7 +89,7 @@ public class TestActivity extends Activity {
 	@Click({ R.id.btn_1, R.id.btn_2, R.id.btn_add_header, R.id.btn_add_footer })
 	void onClick(View v) {
 		switch (v.getId()) {
-//		ListView
+		// ListView
 		case R.id.btn_1:
 
 			mAdapter = new ReViewAdapter<MyBean>(mContext, mDatas) {
@@ -96,9 +100,10 @@ public class TestActivity extends Activity {
 					}
 					return MyViewGroup2_.build(mContext);
 				}
+
 				@Override
 				public int setItemViewType(int position) {
-					if ((position+1)%3==0) {
+					if ((position + 1) % 3 == 0) {
 						return TYPE_WITH_BUTTON;
 					}
 					return TYPE_WITHOUT_BUTTON;
@@ -110,10 +115,10 @@ public class TestActivity extends Activity {
 					MyViewGroup1_.class);
 			break;
 		case R.id.btn_add_header:
-			
+
 			break;
 		case R.id.btn_add_footer:
-			
+
 		}
 		mRecyclerView.setAdapter(mAdapter);
 	}
@@ -122,37 +127,31 @@ public class TestActivity extends Activity {
 	void afterViews() {
 		initDatas();
 
-		TextView headerView = new TextView(mContext);
-		headerView.setText("HeaderView");
-		mRecyclerView.setHeaderView(headerView);
-		
-		TextView footerView = new TextView(mContext);
-		footerView.setText("FooterView");
-		mRecyclerView.setFooterView(footerView);
-		
 		mRecyclerView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(RecyclerView parent, View view,
-					int position, long id, Object data) {
-				Toast.makeText(
-						mContext,
-						"Clicked position : " + position
-								+ ".\nClicked child view ID:" + id + ".", 0)
-						.show();
+					int position, int id, Object data) {
+				Log.d(logTag, "Clicked position : " + position+ ", Title"+ ((MyBean)data).newsTitle + ".");
 			}
 		});
-
+		
+		mRecyclerView.setOnSubItemClickListener(R.id.vg1_btn, new OnSubItemCLickListener() {
+			
+			@Override
+			public void onSubItemClick(View view, Object data) {
+				if (view instanceof TextView) {
+					((Button) view).setText("Clicked");
+				}
+			}
+		});
+		
 		mRecyclerView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
 			public void onItemLongClick(RecyclerView parent, View view,
-					int position, long id, Object data) {
-				Toast.makeText(
-						mContext,
-						"Long clicked position : " + position
-								+ ".\nClicked child view ID:" + id + ".", 0)
-						.show();
+					int position, int id, Object data) {
+				Log.d(logTag,"Long clicked position : " + position+ ".\nClicked child view ID:" + id + ".");
 			}
 		});
 
@@ -167,34 +166,62 @@ public class TestActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(View lastView, int lastPosition) {
-
+				Log.d(logTag, "nothing selected.  lastPosition : " + lastPosition);
 			}
 
 			@Override
 			public void onItemUnselected(View view, int position, int type) {
-
+				Log.d(logTag, "item unselected position : " + position);
 			}
 
 			@Override
 			public void onItemSelected(View view, int position, int type) {
-
+				Log.d(logTag, "item selected position : " + position);
 			}
 		}, true);
 
-		mRecyclerView.setOnRecyclerViewIsBottomListener(new OnRecyclerViewIsBottomListener() {
+		mRecyclerView.setOnLoadMoreListener(new OnLoadMoreListener() {
 
 			@Override
 			public void loadMore() {
 				loadMoreDatas();
 			}
 		});
-
-		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0);
-
+		
+		mRecyclerView.setOnItemLeftScrollListener(new OnItemLeftScrollListener() {
+			
+			@Override
+			public void onItemLeftScroll(View view, int position, float touchPonitX,
+					float distanceX, float totalDistanceX) {
+				Toast.makeText(mContext, "Item : "+position +" left scrolled", 0).show();
+				Log.d(logTag, "onItemLeftScroll : "+position +".");
+			}
+		});
+		
+		mRecyclerView.setOnItemRightScrollListener(new OnItemRightScrollListener() {
+			
+			@Override
+			public void onItemRightScroll(View view, int position, float touchPonitX,
+					float distanceX, float totalDistanceX) {
+				Toast.makeText(mContext, "Item : "+position +"right scrolled", 0).show();
+				Log.d(logTag, "onItemRightScroll : "+position +".");
+			}
+		});
+		
+		TextView headerView = new TextView(mContext);
+		headerView.setText("HeaderView");
+		TextView footerView = new TextView(mContext);
+		footerView.setText("FooterView");
+		
+		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0)
+				.setHeaderView(headerView).setFooterView(footerView)
+				.setAutoLoadMoreEnable(false);
+		// 设置加载状态Itemview显示的文字
+		 mRecyclerView.setLoadState("要显示的文字");
 	}
 
 	private void initDatas() {
-		loadState=STATE_SUCCEEDED;
+		loadState = STATE_SUCCEEDED;
 		Log.d("Test", Thread.currentThread().getName() + "");
 		mDatas = new ArrayList<MyBean>();
 		for (int i = 0; i < 51; i++) {
@@ -229,14 +256,14 @@ public class TestActivity extends Activity {
 			switch (loadState) {
 			case STATE_SUCCEEDED:
 				mAdapter.addDatas((List<MyBean>) msg.obj);
-				mRecyclerView.notifyLoadSucceeded();
+				mRecyclerView.succeeded();
 				Toast.makeText(mContext, "LoadFinish", 0).show();
 				break;
 			case STATE_FAILED:
-				mRecyclerView.notifyLoadFailed();
+				mRecyclerView.failed();
 				break;
 			case STATE_NO_MORE_DATAS:
-				mRecyclerView.notifyNoMoreDatas();
+				mRecyclerView.noMore();
 				break;
 			}
 		};
@@ -246,7 +273,7 @@ public class TestActivity extends Activity {
 	void addDatas(List<MyBean> dataList) {
 		mAdapter.addDatas(dataList);
 		Log.d("Test", Thread.currentThread().getName() + "");
-		mRecyclerView.notifyLoadSucceeded();
+		mRecyclerView.succeeded();
 	}
 
 }

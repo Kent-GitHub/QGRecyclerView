@@ -27,11 +27,6 @@ public class MyViewGroup1 extends ItemView<MyBean>{
 	@ViewById(R.id.vg1_content)
 	TextView beanContent;
 	
-	@Click(R.id.vg1_btn)
-	void onClick(){
-		Toast.makeText(mContext, "Button CLicked", 0).show();
-	}
-	
 	@Override
 	public void bind(MyBean bean){
 		beanImage.setImageResource(bean.iconId);

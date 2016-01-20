@@ -1,7 +1,11 @@
 package com.util.recyclerview;
 
+import java.util.Map;
+
+import android.R.integer;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnItemTouchListener;
@@ -43,9 +47,13 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	private OnItemTouchListener mOnItemTouchListener = this;
 	/**
-	 * Item点击监听实例
+	 * ItemView点击监听事件实例
 	 */
 	private OnItemClickListener mOnItemClickListener = null;
+	/**
+	 * ItemView子view点击监听事件实例
+	 */
+	private OnSubItemCLickListener mOnSubItemCLickListener = null;
 	/**
 	 * Item选中监听实例
 	 */
@@ -65,7 +73,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * Item长按监听实例
 	 */
-	private OnRecyclerViewIsBottomListener mOnRecyclerViewIsBottomListener;
+	private OnLoadMoreListener mOnLoadMoreListener;
 	/**
 	 * Item被选中时显示的背景色，为灰色
 	 */
@@ -74,6 +82,10 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * Item未被选中时显示的背景色，为透明
 	 */
 	private int unSelectedColor = Color.parseColor("#00ffffff");
+	/**
+	 * 触发SubView点击事件的ViewID
+	 */
+	private int mSubViewId;
 	/**
 	 * 选中效果
 	 */
@@ -120,6 +132,17 @@ public class CustomRecyclerView extends RecyclerView implements
 	public void setOnItemClickListener(OnItemClickListener listener) {
 		this.addOnItemTouchListener(mOnItemTouchListener);
 		mOnItemClickListener = listener;
+	}
+
+	/**
+	 * 设置ItemView子view点击监听事件
+	 * 
+	 * @param id
+	 */
+	public void setOnSubItemClickListener(int subViewId,
+			OnSubItemCLickListener listener) {
+		mSubViewId = subViewId;
+		mOnSubItemCLickListener = listener;
 	}
 
 	/**
@@ -213,13 +236,12 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
-	 * 设置RecyclerView划到底部监听
+	 * 设置RecyclerView划到底部加载更多的监听事件
 	 * 
 	 * @param listener
 	 */
-	public void setOnRecyclerViewIsBottomListener(
-			OnRecyclerViewIsBottomListener listener) {
-		mOnRecyclerViewIsBottomListener = listener;
+	public void setOnLoadMoreListener(OnLoadMoreListener listener) {
+		mOnLoadMoreListener = listener;
 		getDefaultLoadStateView();
 		if (listener != null && getAdapter() != null) {
 			getMyAdapter().setLoadStateView(mLoadStateView);
@@ -234,7 +256,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * 
 	 * @return
 	 */
-	public final OnItemClickListener getOnItemClickListener() {
+	public OnItemClickListener getOnItemClickListener() {
 		return mOnItemClickListener;
 	}
 
@@ -243,7 +265,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * 
 	 * @return
 	 */
-	public final OnItemSelectedListener getOnItemSelectedLisenter() {
+	public OnItemSelectedListener getOnItemSelectedLisenter() {
 		return mOnItemSelectedListener;
 	}
 
@@ -252,7 +274,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * 
 	 * @return
 	 */
-	public final OnItemLongClickListener getOnItemLongClickListener() {
+	public OnItemLongClickListener getOnItemLongClickListener() {
 		return mOnItemLongClickListener;
 	}
 
@@ -261,28 +283,8 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * 
 	 * @return
 	 */
-	public final OnRecyclerViewIsBottomListener getOnRecyclerViewIsBottomListener() {
-		return mOnRecyclerViewIsBottomListener;
-	}
-
-	/**
-	 * 移除HeaderView
-	 * 
-	 * @param headerView
-	 */
-	public void removeHeaderView(View headerView) {
-		mHeaderView = null;
-		getMyAdapter().setHeaderView(null);
-	}
-
-	/**
-	 * 移除FooterView
-	 * 
-	 * @param headerView
-	 */
-	public void removeFooterView(View footerView) {
-		mFooterView = null;
-		getMyAdapter().setFooterView(null);
+	public OnLoadMoreListener getOnLoadMoreListener() {
+		return mOnLoadMoreListener;
 	}
 
 	/**
@@ -296,35 +298,8 @@ public class CustomRecyclerView extends RecyclerView implements
 		myAdapter.setOnItemSelectedListener(mOnItemSelectedListener,
 				selectedEffectEnable, selectedColor, unSelectedColor);
 		myAdapter.setFooterView(mFooterView);
-
 		myAdapter.setHeaderView(mHeaderView);
-
 		myAdapter.setLoadStateView(mLoadStateView);
-
-	}
-
-	/**
-	 * 设置HeaderView
-	 * 
-	 * @param headerView
-	 */
-	public void setHeaderView(View headerView) {
-		mHeaderView = headerView;
-		if (getMyAdapter() != null) {
-			getMyAdapter().setHeaderView(mHeaderView);
-		}
-	}
-
-	/**
-	 * 设置FooterView
-	 * 
-	 * @param footerView
-	 */
-	public void setFooterView(View footerView) {
-		mFooterView = footerView;
-		if (getMyAdapter() != null) {
-			getMyAdapter().setFooterView(mFooterView);
-		}
 	}
 
 	/**
@@ -355,6 +330,64 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
+	 * 移除HeaderView
+	 * 
+	 * @param headerView
+	 */
+	public void removeHeaderView(View headerView) {
+		mHeaderView = null;
+		getMyAdapter().setHeaderView(null);
+	}
+
+	/**
+	 * 移除FooterView
+	 * 
+	 * @param headerView
+	 */
+	public void removeFooterView(View footerView) {
+		mFooterView = null;
+		getMyAdapter().setFooterView(null);
+	}
+
+	/**
+	 * 设置HeaderView
+	 * 
+	 * @param headerView
+	 */
+	public CustomRecyclerView setHeaderView(View headerView) {
+		mHeaderView = headerView;
+		if (getMyAdapter() != null) {
+			getMyAdapter().setHeaderView(mHeaderView);
+		}
+		return this;
+	}
+
+	/**
+	 * 设置FooterView
+	 * 
+	 * @param footerView
+	 */
+	public CustomRecyclerView setFooterView(View footerView) {
+		mFooterView = footerView;
+		if (getMyAdapter() != null) {
+			getMyAdapter().setFooterView(mFooterView);
+		}
+		return this;
+	}
+
+	/**
+	 * 设置加载状态文本
+	 * 
+	 * @param state
+	 */
+	public CustomRecyclerView setLoadState(String state) {
+		if (mLoadStateView != null) {
+			mLoadStateView.setLoadingStateText(state);
+		}
+		return this;
+	}
+
+	/**
 	 * 设置分割线
 	 * 
 	 * @param color
@@ -377,7 +410,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
-	 * 设置出发OnLoadMore时是否自动刷新
+	 * 设置触发OnLoadMore时是否自动刷新
 	 */
 	public CustomRecyclerView setAutoLoadMoreEnable(boolean autoLoadMore) {
 		isAutoLoadMore = autoLoadMore;
@@ -390,8 +423,16 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * @param <T>
 	 */
 	public interface OnItemClickListener {
-		void onItemClick(RecyclerView parent, View view, int position, long id,
+		void onItemClick(RecyclerView parent, View view, int position, int id,
 				Object data);
+	}
+
+	/**
+	 * ItemView子View点击监听事件接口
+	 * 
+	 */
+	public interface OnSubItemCLickListener {
+		void onSubItemClick(View view, Object data);
 	}
 
 	/**
@@ -417,7 +458,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	public interface OnItemLongClickListener {
 		void onItemLongClick(RecyclerView parent, View view, int position,
-				long id, Object data);
+				int id, Object data);
 	}
 
 	/**
@@ -437,7 +478,7 @@ public class CustomRecyclerView extends RecyclerView implements
 				float distanceX, float totalDistanceX);
 	}
 
-	public interface OnRecyclerViewIsBottomListener {
+	public interface OnLoadMoreListener {
 		/**
 		 * RecyclerView在底部时加载更多
 		 */
@@ -447,7 +488,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * 通知RecyclerView加载数据已开始
 	 */
-	private void notifyLoadStarted() {
+	private void loadStarted() {
 		isLoadingMore = true;
 		mLoadStateView.setLoadingStateText("正在加载中");
 		mLoadStateView.showProgressBar();
@@ -456,7 +497,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * 数据更新完成后通知RecyclerView刷新完成
 	 */
-	public void notifyLoadSucceeded() {
+	public void succeeded() {
 		isLoadingMore = false;
 		mLoadStateView.hideProgressBar();
 		mLoadStateView.setLoadingStateText("点击加载更多");
@@ -465,7 +506,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * 通知RecyclerView数据加载失败
 	 */
-	public void notifyLoadFailed() {
+	public void failed() {
 		isLoadingMore = false;
 		mLoadStateView.hideProgressBar();
 		mLoadStateView.setLoadingStateText("加载失败，点击重试");
@@ -474,7 +515,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * 通知RecyclerView已无数据可以加载
 	 */
-	public void notifyNoMoreDatas() {
+	public void noMore() {
 		isLoadingMore = false;
 		mLoadStateView.hideProgressBar();
 		mLoadStateView.setLoadingStateText("没有更多数据了");
@@ -508,10 +549,10 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * @param event
 	 * @return
 	 */
-	private long getTouchPointId(View view, MotionEvent event) {
+	private int getTouchPointId(View view, MotionEvent event) {
 		int x = (int) event.getRawX();
 		int y = (int) event.getRawY();
-		long id = 0;
+		int id = 0;
 		if (view instanceof ViewGroup) {
 			ViewGroup vg = (ViewGroup) view;
 			for (int i = 0; i < vg.getChildCount(); i++) {
@@ -525,6 +566,7 @@ public class CustomRecyclerView extends RecyclerView implements
 				}
 			}
 		} else {
+
 			return view.getId();
 		}
 		return id;
@@ -572,15 +614,30 @@ public class CustomRecyclerView extends RecyclerView implements
 		return false;
 	}
 
+	/**
+	 * 标记判定左划右划事件中方向是否已经确定
+	 */
 	private boolean isDirectionConfirm = false;
+	/**
+	 * 是否已确定为左划事件
+	 */
 	private boolean isHorizontalLeftScroll = false;
+	/**
+	 * 是否已确定为右划事件
+	 */
 	private boolean isHorizontalRightScroll = false;
 	/**
-	 * mGestureDetector由触摸事件判断并触发ItemView的点击事件，长按事件
+	 * 标记在某一次滑动中左划、右划是否已经触发
+	 */
+	private boolean isHorizontalScrollTriggered = false;
+	/**
+	 * mGestureDetector由OnItemTouchListener的方法调用并触发ItemView的点击事件、长按事件、左划右划事件
 	 */
 	private GestureDetector mGestureDetector = new GestureDetector(mContext,
 			new SimpleOnGestureListener() {
-
+				/**
+				 * 触发ItemView点击事件或SubView点击事件或者触发LoadStateView的点击加载更多
+				 */
 				@Override
 				public boolean onSingleTapConfirmed(MotionEvent e) {
 					View view = findChildViewUnder(e.getX(), e.getY());
@@ -588,66 +645,97 @@ public class CustomRecyclerView extends RecyclerView implements
 					int viewType = getMyAdapter().getItemViewType(position);
 					if (view != null && mOnItemClickListener != null
 							&& viewType != VIEW_TYPE_LOAD_STATE_VIEW) {
+						// 触发ItemView点击事件
 						mOnItemClickListener.onItemClick(
 								CustomRecyclerView.this, view, position,
 								getTouchPointId(view, e),
 								getDataByPosition(position));
 					} else if (view != null && !isLoadingMore
 							&& viewType == VIEW_TYPE_LOAD_STATE_VIEW
-							&& mOnRecyclerViewIsBottomListener != null) {
-						mOnRecyclerViewIsBottomListener.loadMore();
-						notifyLoadStarted();
+							&& mOnLoadMoreListener != null) {
+						// 触发LoadStateView加载更多事件
+						mOnLoadMoreListener.loadMore();
+						loadStarted();
+					}
+					if (mOnSubItemCLickListener != null
+							&& mSubViewId == getTouchPointId(view, e)) {
+						// 触发SubView点击事件
+						mOnSubItemCLickListener.onSubItemClick(
+								view.findViewById(mSubViewId),
+								getDataByPosition(position));
 					}
 					return true;
 				}
 
+				/**
+				 * 触发长按事件
+				 */
 				@Override
 				public void onLongPress(MotionEvent e) {
-					View view = findChildViewUnder(e.getX(), e.getY());
-					int position = getChildPosition(view);
-					super.onLongPress(e);
 					if (mOnItemLongClickListener != null) {
+						View view = findChildViewUnder(e.getX(), e.getY());
+						int position = getChildPosition(view);
+						super.onLongPress(e);
 						mOnItemLongClickListener.onItemLongClick(
 								CustomRecyclerView.this, view, position,
-								getTouchPointId(view, e), getMyAdapter()
-										.getDate(position));
+								getTouchPointId(view, e),
+								getDataByPosition(position));
 					}
 				}
 
+				/**
+				 * 触发左划右划事件
+				 */
 				@Override
 				public boolean onScroll(MotionEvent e1, MotionEvent e2,
 						float distanceX, float distanceY) {
 					if (mOnItemLeftScrollListener != null
 							|| mOnItemRightScrollListener != null) {
+						int parentWidth = getWidth();
 						View view = findChildViewUnder(e1.getX(), e1.getY());
-						if (!isDirectionConfirm) {
-							if (Math.abs(distanceX) > Math.abs(3 * distanceY)) {
-								isHorizontalRightScroll = !(isHorizontalLeftScroll = e2
-										.getX() < e1.getX());
-							} else {
-								isHorizontalLeftScroll = false;
-								isHorizontalRightScroll = false;
+						int position = getChildPosition(view);
+						int viewType = getAdapter().getItemViewType(position);
+						if (view != null
+								&& viewType != VIEW_TYPE_LOAD_STATE_VIEW) {
+							if (!isDirectionConfirm) {
+								if (Math.abs(distanceX) > Math
+										.abs(3 * distanceY)) {
+									isHorizontalRightScroll = !(isHorizontalLeftScroll = e2
+											.getX() < e1.getX());
+								} else {
+									isHorizontalLeftScroll = false;
+									isHorizontalRightScroll = false;
+								}
+								isDirectionConfirm = true;
 							}
-							isDirectionConfirm = true;
-						}
-						if (isHorizontalLeftScroll
-								&& mOnItemLeftScrollListener != null) {
-							mOnItemLeftScrollListener.onItemLeftScroll(view,
-									getChildPosition(view), e1.getRawX(),
-									distanceX, e1.getX() - e2.getX());
-						} else if (isHorizontalRightScroll
-								&& mOnItemRightScrollListener != null) {
-							mOnItemRightScrollListener.onItemRightScroll(view,
-									getChildPosition(view), e1.getRawX(),
-									distanceX, e1.getX() - e2.getX());
+							if (isHorizontalLeftScroll
+									&& mOnItemLeftScrollListener != null
+									&& !isHorizontalScrollTriggered
+									&& (e1.getX() - e2.getX()) > parentWidth / 3) {
+								isHorizontalScrollTriggered = true;
+								mOnItemLeftScrollListener.onItemLeftScroll(
+										view, getChildPosition(view),
+										e1.getRawX(), distanceX,
+										e1.getX() - e2.getX());
+							} else if (isHorizontalRightScroll
+									&& mOnItemRightScrollListener != null
+									&& !isHorizontalScrollTriggered
+									&& (e2.getX() - e1.getX()) > parentWidth / 3) {
+								isHorizontalScrollTriggered = true;
+								mOnItemRightScrollListener.onItemRightScroll(
+										view, getChildPosition(view),
+										e1.getRawX(), distanceX,
+										e1.getX() - e2.getX());
+							}
 						}
 					}
+
 					return super.onScroll(e1, e2, distanceX, distanceY);
 				}
 
 			});
 	/**
-	 * RecyclerView的OnScrollListener实例，RecyclerView在底部是触发加载更多事件
+	 * RecyclerView的OnScrollListener实例
 	 */
 	private OnScrollListener mScrollListener = new OnScrollListener() {
 
@@ -661,12 +749,14 @@ public class CustomRecyclerView extends RecyclerView implements
 			// }
 		}
 
+		/**
+		 * RecyclerView在底部时触发加载更多事件
+		 */
 		@Override
 		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-			if (mOnRecyclerViewIsBottomListener != null && isAutoLoadMore
-					&& isBottom()) {
-				mOnRecyclerViewIsBottomListener.loadMore();
-				notifyLoadStarted();
+			if (mOnLoadMoreListener != null && isAutoLoadMore && isBottom()) {
+				mOnLoadMoreListener.loadMore();
+				loadStarted();
 			}
 		}
 	};
@@ -678,6 +768,7 @@ public class CustomRecyclerView extends RecyclerView implements
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_UP:
 			isDirectionConfirm = false;
+			isHorizontalScrollTriggered = false;
 			break;
 		}
 		if (isDirectionConfirm
@@ -693,6 +784,7 @@ public class CustomRecyclerView extends RecyclerView implements
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_UP:
 			isDirectionConfirm = false;
+			isHorizontalScrollTriggered = false;
 			break;
 		}
 	}

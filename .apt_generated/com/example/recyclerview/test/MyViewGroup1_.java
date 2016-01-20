@@ -7,8 +7,6 @@
 package com.example.recyclerview.test;
 
 import android.content.Context;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.qgrecyclerview.R.id;
@@ -70,24 +68,9 @@ public final class MyViewGroup1_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        beanImage = ((ImageView) hasViews.findViewById(id.vg1_image));
         beanTitle = ((TextView) hasViews.findViewById(id.vg1_title));
         beanContent = ((TextView) hasViews.findViewById(id.vg1_content));
-        {
-            View view = hasViews.findViewById(id.vg1_btn);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MyViewGroup1_.this.onClick();
-                    }
-
-                }
-                );
-            }
-        }
+        beanImage = ((ImageView) hasViews.findViewById(id.vg1_image));
     }
 
 }
