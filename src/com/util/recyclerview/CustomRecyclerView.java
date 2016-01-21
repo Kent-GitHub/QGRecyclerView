@@ -76,7 +76,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	/**
 	 * Item被选中时显示的背景色，为灰色
 	 */
-	private int selectedColor = Color.parseColor("#20000000");
+	private int selectedColor = Color.parseColor("#20000000");    
 	/**
 	 * Item未被选中时显示的背景色，为透明
 	 */
