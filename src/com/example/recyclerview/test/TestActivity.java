@@ -188,8 +188,7 @@ public class TestActivity extends Activity {
 		mRecyclerView.setOnItemLeftScrollListener(new OnItemLeftScrollListener() {
 			
 			@Override
-			public void onItemLeftScroll(View view, int position, float touchPonitX,
-					float distanceX, float totalDistanceX) {
+			public void onItemLeftScroll(View view, int position) {
 				Toast.makeText(mContext, "Item : "+position +" left scrolled", 0).show();
 				Log.d(logTag, "onItemLeftScroll : "+position +".");
 			}
@@ -198,8 +197,7 @@ public class TestActivity extends Activity {
 		mRecyclerView.setOnItemRightScrollListener(new OnItemRightScrollListener() {
 			
 			@Override
-			public void onItemRightScroll(View view, int position, float touchPonitX,
-					float distanceX, float totalDistanceX) {
+			public void onItemRightScroll(View view, int position) {
 				Toast.makeText(mContext, "Item : "+position +"right scrolled", 0).show();
 				Log.d(logTag, "onItemRightScroll : "+position +".");
 			}

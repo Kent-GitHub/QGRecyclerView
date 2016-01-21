@@ -6,9 +6,12 @@
 
 package com.example.recyclerview.test;
 
+import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,7 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.example.qgrecyclerview.R.id;
 import com.example.qgrecyclerview.R.layout;
-import com.util.recyclerview.SwipeRecyclerView;
+import com.util.recyclerview.SwipeView;
 import org.androidannotations.api.BackgroundExecutor;
 import org.androidannotations.api.builder.ActivityIntentBuilder;
 import org.androidannotations.api.view.HasViews;
@@ -30,6 +33,7 @@ public final class SwipeTestActy_
 {
 
     private final OnViewChangedNotifier onViewChangedNotifier_ = new OnViewChangedNotifier();
+    private Handler handler_ = new Handler(Looper.getMainLooper());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,9 +80,9 @@ public final class SwipeTestActy_
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        mSwipeRecyclerView = ((SwipeRecyclerView) hasViews.findViewById(id.swipe_test_swipeView));
+        mSwipeView = ((SwipeView) hasViews.findViewById(id.swipe_test_swipeView));
         {
-            View view = hasViews.findViewById(id.btn_1);
+            View view = hasViews.findViewById(id.s_btn_1);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
@@ -93,7 +97,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_2);
+            View view = hasViews.findViewById(id.s_btn_2);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
@@ -108,7 +112,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_add_header);
+            View view = hasViews.findViewById(id.s_btn_add_header);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
@@ -123,7 +127,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_add_footer);
+            View view = hasViews.findViewById(id.s_btn_add_footer);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
@@ -138,7 +142,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state1));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state1));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -153,7 +157,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state2));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state2));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -168,7 +172,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state3));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state3));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -183,7 +187,7 @@ public final class SwipeTestActy_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_auto_load));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_auto_load));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -201,6 +205,34 @@ public final class SwipeTestActy_
     }
 
     @Override
+    public void onRefreshFinish() {
+        handler_.post(new Runnable() {
+
+
+            @Override
+            public void run() {
+                SwipeTestActy_.super.onRefreshFinish();
+            }
+
+        }
+        );
+    }
+
+    @Override
+    public void addDatas(final List<MyBean> dataList) {
+        handler_.post(new Runnable() {
+
+
+            @Override
+            public void run() {
+                SwipeTestActy_.super.addDatas(dataList);
+            }
+
+        }
+        );
+    }
+
+    @Override
     public void loadMoreDatas() {
         BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
 
@@ -209,6 +241,24 @@ public final class SwipeTestActy_
             public void execute() {
                 try {
                     SwipeTestActy_.super.loadMoreDatas();
+                } catch (Throwable e) {
+                    Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+                }
+            }
+
+        }
+        );
+    }
+
+    @Override
+    public void onRecyclerViewRefresh() {
+        BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
+
+
+            @Override
+            public void execute() {
+                try {
+                    SwipeTestActy_.super.onRecyclerViewRefresh();
                 } catch (Throwable e) {
                     Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                 }

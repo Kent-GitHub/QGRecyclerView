@@ -1,6 +1,7 @@
 package com.example.recyclerview.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.androidannotations.annotations.AfterViews;
@@ -8,19 +9,19 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.CheckedChange;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.UiThread;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ import com.util.recyclerview.CustomRecyclerView.OnItemSelectedListener;
 import com.util.recyclerview.CustomRecyclerView.OnLoadMoreListener;
 import com.util.recyclerview.CustomRecyclerView.OnSubItemCLickListener;
 import com.util.recyclerview.ReViewAdapter;
-import com.util.recyclerview.SwipeRecyclerView;
+import com.util.recyclerview.SwipeView;
 @EActivity(R.layout.swipe_test_layout)
 public class SwipeTestActy extends Activity{
 	private CustomRecyclerView mRecyclerView;
@@ -43,7 +44,7 @@ public class SwipeTestActy extends Activity{
 	private ReViewAdapter<MyBean> mAdapter;
 	
 	@ViewById(R.id.swipe_test_swipeView)
-	SwipeRecyclerView mSwipeRecyclerView;
+	SwipeView mSwipeView;
 	
 	public final int STATE_SUCCEEDED = 1;
 	public final int STATE_FAILED = 2;
@@ -51,27 +52,26 @@ public class SwipeTestActy extends Activity{
 	
 	private int loadState;
 	private String logTag="SwipeTestActy";
-	
 
-	@CheckedChange({ R.id.test_state1, R.id.test_state2, R.id.test_state3,
-			R.id.test_auto_load })
+	@CheckedChange({ R.id.s_test_state1, R.id.s_test_state2, R.id.s_test_state3,
+			R.id.s_test_auto_load })
 	void checkChanged(CompoundButton button, boolean isChecked) {
 		if (isChecked) {
 			switch (button.getId()) {
-			case R.id.test_state1:
+			case R.id.s_test_state1:
 				loadState = 1;
 				break;
-			case R.id.test_state2:
+			case R.id.s_test_state2:
 				loadState = 2;
 				break;
-			case R.id.test_state3:
+			case R.id.s_test_state3:
 				loadState = 3;
 				break;
-			case R.id.test_auto_load:
+			case R.id.s_test_auto_load:
 				mRecyclerView.setAutoLoadMoreEnable(isChecked);
 			}
 		} else {
-			if (button.getId() == R.id.test_auto_load) {
+			if (button.getId() == R.id.s_test_auto_load) {
 				mRecyclerView.setAutoLoadMoreEnable(isChecked);
 			}
 		}
@@ -80,10 +80,10 @@ public class SwipeTestActy extends Activity{
 	public static final int TYPE_WITHOUT_BUTTON = 1;
 	public static final int TYPE_WITH_BUTTON = 2;
 
-	@Click({ R.id.btn_1, R.id.btn_2, R.id.btn_add_header, R.id.btn_add_footer })
+	@Click({ R.id.s_btn_1, R.id.s_btn_2, R.id.s_btn_add_header, R.id.s_btn_add_footer })
 	void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.btn_1:
+		case R.id.s_btn_1:
 
 			mAdapter = new ReViewAdapter<MyBean>(mContext, mDatas) {
 				@Override
@@ -103,15 +103,20 @@ public class SwipeTestActy extends Activity{
 				}
 			};
 			break;
-		case R.id.btn_2:
+		case R.id.s_btn_2:
 			mAdapter = new ReViewAdapter<MyBean>(mContext, mDatas,
 					MyViewGroup1_.class);
 			break;
-		case R.id.btn_add_header:
-
+		case R.id.s_btn_add_header:
+			TextView headerView = new TextView(mContext);
+			headerView.setText("HeaderView");
+			mRecyclerView.setHeaderView(headerView);
 			break;
-		case R.id.btn_add_footer:
-
+		case R.id.s_btn_add_footer:
+			TextView footerView = new TextView(mContext);
+			footerView.setText("FooterView");
+			mRecyclerView.setFooterView(footerView);
+			break;
 		}
 		mRecyclerView.setAdapter(mAdapter);
 	}
@@ -119,13 +124,25 @@ public class SwipeTestActy extends Activity{
 	@AfterViews
 	void afterViews() {
 		initDatas();
-		mRecyclerView=mSwipeRecyclerView.getRecyclerView();
+		
+		mSwipeView.setOnRefreshListener(new OnRefreshListener() {
+			
+			@Override
+			public void onRefresh() {
+				onRecyclerViewRefresh();
+			}
+		});
+		
+		mRecyclerView=mSwipeView.getRecyclerView();
+		
 		mRecyclerView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(RecyclerView parent, View view,
 					int position, int id, Object data) {
-				Log.d(logTag, "Clicked position : " + position+ ", Title"+ ((MyBean)data).newsTitle + ".");
+				Log.d(logTag, "Clicked position : " + position
+//						+ ", Title"+ ((MyBean)data).newsTitle + "."
+						);
 			}
 		});
 		
@@ -159,17 +176,17 @@ public class SwipeTestActy extends Activity{
 
 			@Override
 			public void onNothingSelected(View lastView, int lastPosition) {
-				Log.d(logTag, "nothing selected.  lastPosition : " + lastPosition);
+//				Log.d(logTag, "nothing selected.  lastPosition : " + lastPosition);
 			}
 
 			@Override
 			public void onItemUnselected(View view, int position, int type) {
-				Log.d(logTag, "item unselected position : " + position);
+//				Log.d(logTag, "item unselected position : " + position);
 			}
 
 			@Override
 			public void onItemSelected(View view, int position, int type) {
-				Log.d(logTag, "item selected position : " + position);
+//				Log.d(logTag, "item selected position : " + position);
 			}
 		}, true);
 
@@ -184,8 +201,7 @@ public class SwipeTestActy extends Activity{
 		mRecyclerView.setOnItemLeftScrollListener(new OnItemLeftScrollListener() {
 			
 			@Override
-			public void onItemLeftScroll(View view, int position, float touchPonitX,
-					float distanceX, float totalDistanceX) {
+			public void onItemLeftScroll(View view, int position) {
 				Toast.makeText(mContext, "Item : "+position +" left scrolled", 0).show();
 				Log.d(logTag, "onItemLeftScroll : "+position +".");
 			}
@@ -194,21 +210,13 @@ public class SwipeTestActy extends Activity{
 		mRecyclerView.setOnItemRightScrollListener(new OnItemRightScrollListener() {
 			
 			@Override
-			public void onItemRightScroll(View view, int position, float touchPonitX,
-					float distanceX, float totalDistanceX) {
+			public void onItemRightScroll(View view, int position) {
 				Toast.makeText(mContext, "Item : "+position +"right scrolled", 0).show();
 				Log.d(logTag, "onItemRightScroll : "+position +".");
 			}
 		});
 		
-		TextView headerView = new TextView(mContext);
-		headerView.setText("HeaderView");
-		TextView footerView = new TextView(mContext);
-		footerView.setText("FooterView");
-		
-		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0)
-				.setHeaderView(headerView).setFooterView(footerView)
-				.setAutoLoadMoreEnable(false);
+		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0).setAutoLoadMoreEnable(false);
 		// 设置加载状态Itemview显示的文字
 		 mRecyclerView.setLoadState("要显示的文字");
 	}
@@ -238,34 +246,42 @@ public class SwipeTestActy extends Activity{
 					"新闻内容~~~~~~~~~~~~~~~~~~~" + i);
 			dataList.add(bean);
 		}
-		// addDatas(dataList);
-		Message msg = Message.obtain();
-		msg.obj = dataList;
-		handler.sendMessage(msg);
+		 addDatas(dataList);
 	}
-
-	Handler handler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (loadState) {
-			case STATE_SUCCEEDED:
-				mAdapter.addDatas((List<MyBean>) msg.obj);
-				mRecyclerView.succeeded();
-				Toast.makeText(mContext, "LoadFinish", 0).show();
-				break;
-			case STATE_FAILED:
-				mRecyclerView.failed();
-				break;
-			case STATE_NO_MORE_DATAS:
-				mRecyclerView.noMore();
-				break;
-			}
-		};
-	};
-
+	
+	@Background 
+	void onRecyclerViewRefresh(){
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		onRefreshFinish();
+	}
+	
+	@UiThread
+	void onRefreshFinish(){
+		Date date=new Date(System.currentTimeMillis());
+		MyBean bean=mDatas.get(0);
+		bean.newsContent=date.toString();
+		mDatas.set(0, bean);
+		mRecyclerView.getAdapter().notifyDataSetChanged();
+		mSwipeView.setRefreshing(false);
+	}
+	
 	@UiThread
 	void addDatas(List<MyBean> dataList) {
-		mAdapter.addDatas(dataList);
-		Log.d("Test", Thread.currentThread().getName() + "");
-		mRecyclerView.succeeded();
+		switch (loadState) {
+		case STATE_SUCCEEDED:
+			mAdapter.addDatas(dataList);
+			mRecyclerView.succeeded();
+			break;
+		case STATE_FAILED:
+			mRecyclerView.failed();
+			break;
+		case STATE_NO_MORE_DATAS:
+			mRecyclerView.noMore();
+			break;
+		}
 	}
 }

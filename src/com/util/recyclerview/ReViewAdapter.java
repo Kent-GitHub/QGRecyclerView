@@ -28,7 +28,7 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 	private List<T> mDatas;
 
 	private Context mContext;
-
+	
 	private View mItemView = null;
 
 	private View mHeaderView;
@@ -42,13 +42,14 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 	 * RecyclerView实例
 	 */
 	private CustomRecyclerView mRecyclerView;
-
+	/**
+	 * 继承ItemView的类的类类型
+	 */
 	private Class mViewClass;
 	/**
 	 * ItemView选中监听事件实例
 	 */
 	private OnItemSelectedListener mOnItemSelectedListener;
-
 	/**
 	 * 记录选中的ItemView
 	 */
@@ -81,8 +82,7 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 	}
 
 	/**
-	 * Adapter构造函数
-	 * 
+	 * Adapter构造函数，需要复写onCreateItemView(int viewType)方法
 	 * @param context
 	 *            上下文
 	 * @param datas
@@ -184,30 +184,29 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 		if (mOnItemSelectedListener != null) {
 			bindListener(holder, position);
 		}
-		// 針對ItemSelected事件, 取消ViewHolder複用的影響
-		// Item被选时修改背景色
+		//		 針對ItemSelected事件, 取消ViewHolder複用的影響
+		//		 Item被选时修改背景色
+		int viewType = getItemViewType(position);
 		if (selectedItem.get(position)) {
-			int viewType = getItemViewType(position);
-			if (viewType != CustomRecyclerView.VIEW_TYPE_LOAD_STATE_VIEW
-					&& viewType != CustomRecyclerView.VIEW_TYPE_HEADER
-					&& viewType != CustomRecyclerView.VIEW_TYPE_FOOTER) {
-				if (selectedEffectEnable) {
-					holder.getView()
-							.setBackgroundColor(selectedBackgroundColor);
-				}
-				if (mOnItemSelectedListener != null) {
-					mOnItemSelectedListener.onItemSelected(holder.getView(),
-							position, getItemViewType(position));
-				}
-			} else {
-				if (selectedEffectEnable) {
-					holder.getView().setBackgroundColor(
-							unSelectedBackgroundColor);
-				}
-				if (mOnItemSelectedListener != null) {
-					mOnItemSelectedListener.onItemUnselected(holder.getView(),
-							position, getItemViewType(position));
-				}
+			int fixPosition=position-(mHeaderView!=null?1:0);
+			if (selectedEffectEnable) {
+				holder.getView().setBackgroundColor(selectedBackgroundColor);
+			}
+			if (mOnItemSelectedListener!=null) {
+				mOnItemSelectedListener.onItemSelected(holder.getView(),
+						fixPosition, getItemViewType(fixPosition));
+			}
+		}else if (!selectedItem.get(position)&&viewType != CustomRecyclerView.VIEW_TYPE_LOAD_STATE_VIEW
+				&& viewType != CustomRecyclerView.VIEW_TYPE_HEADER
+				&& viewType != CustomRecyclerView.VIEW_TYPE_FOOTER) {
+			int fixPosition=position-(mHeaderView!=null?1:0);;
+			if (selectedEffectEnable) {
+				holder.getView().setBackgroundColor(
+						unSelectedBackgroundColor);
+			}
+			if (mOnItemSelectedListener != null) {
+				mOnItemSelectedListener.onItemUnselected(holder.getView(),
+						fixPosition, getItemViewType(fixPosition));
 			}
 		}
 	}
@@ -279,8 +278,8 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 	/**
 	 * 在末尾添加单个数据
 	 */
-	public void addData(T t) {
-		mDatas.add(t);
+	public void addData(T data) {
+		mDatas.add(data);
 		notifyDataSetChanged();
 	}
 
@@ -291,7 +290,12 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 		mDatas.addAll(datas);
 		notifyDataSetChanged();
 	}
-
+	/**
+	 * 更换单个数据
+	 */
+	public void setData(int position,T data){
+		
+	}
 	/**
 	 * 更换全部数据
 	 */
@@ -313,22 +317,23 @@ public class ReViewAdapter<T> extends RecyclerView.Adapter<ReViewHolder> {
 				if (viewType != CustomRecyclerView.VIEW_TYPE_LOAD_STATE_VIEW
 						&& viewType != CustomRecyclerView.VIEW_TYPE_HEADER
 						&& viewType != CustomRecyclerView.VIEW_TYPE_FOOTER) {
+					int fixPosition=position-(mHeaderView!=null?1:0);
 					if (selectedItem.get(position)) {
 						if (selectedEffectEnable) {
 							v.setBackgroundColor(unSelectedBackgroundColor);
 						}
-						mOnItemSelectedListener.onItemUnselected(v, position,
+						mOnItemSelectedListener.onItemUnselected(v, fixPosition,
 								viewType);
 						selectedItem.delete(position);
 						if (selectedItem.size() == 0) {
 							mOnItemSelectedListener.onNothingSelected(v,
-									position);
+									fixPosition);
 						}
 					} else {
 						if (selectedEffectEnable) {
 							v.setBackgroundColor(selectedBackgroundColor);
 						}
-						mOnItemSelectedListener.onItemSelected(v, position,
+						mOnItemSelectedListener.onItemSelected(v, fixPosition,
 								viewType);
 						selectedItem.append(position, true);
 					}

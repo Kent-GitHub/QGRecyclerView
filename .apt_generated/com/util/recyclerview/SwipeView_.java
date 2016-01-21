@@ -7,12 +7,8 @@
 package com.util.recyclerview;
 
 import android.content.Context;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import com.example.qgrecyclerview.R.id;
-import com.example.qgrecyclerview.R.layout;
+import android.util.AttributeSet;
 import org.androidannotations.api.view.HasViews;
-import org.androidannotations.api.view.OnViewChangedListener;
 import org.androidannotations.api.view.OnViewChangedNotifier;
 
 
@@ -24,21 +20,26 @@ import org.androidannotations.api.view.OnViewChangedNotifier;
  * 
  */
 @SuppressWarnings("unused")
-public final class LoadStateView_
-    extends LoadStateView
-    implements HasViews, OnViewChangedListener
+public final class SwipeView_
+    extends SwipeView
+    implements HasViews
 {
 
     private boolean alreadyInflated_ = false;
     private final OnViewChangedNotifier onViewChangedNotifier_ = new OnViewChangedNotifier();
 
-    public LoadStateView_(Context context) {
+    public SwipeView_(Context context) {
         super(context);
         init_();
     }
 
-    public static LoadStateView build(Context context) {
-        LoadStateView_ instance = new LoadStateView_(context);
+    public SwipeView_(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init_();
+    }
+
+    public static SwipeView build(Context context) {
+        SwipeView_ instance = new SwipeView_(context);
         instance.onFinishInflate();
         return instance;
     }
@@ -54,7 +55,6 @@ public final class LoadStateView_
     public void onFinishInflate() {
         if (!alreadyInflated_) {
             alreadyInflated_ = true;
-            inflate(getContext(), layout.load_state_layout, this);
             onViewChangedNotifier_.notifyViewChanged(this);
         }
         super.onFinishInflate();
@@ -62,14 +62,13 @@ public final class LoadStateView_
 
     private void init_() {
         OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(onViewChangedNotifier_);
-        OnViewChangedNotifier.registerOnViewChangedListener(this);
         OnViewChangedNotifier.replaceNotifier(previousNotifier);
     }
 
-    @Override
-    public void onViewChanged(HasViews hasViews) {
-        mTextView = ((TextView) hasViews.findViewById(id.load_tv));
-        mProgressBar = ((ProgressBar) hasViews.findViewById(id.load_progressBar));
+    public static SwipeView build(Context context, AttributeSet attrs) {
+        SwipeView_ instance = new SwipeView_(context, attrs);
+        instance.onFinishInflate();
+        return instance;
     }
 
 }
