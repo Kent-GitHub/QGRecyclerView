@@ -4,15 +4,11 @@
 //
 
 
-package com.example.recyclerview.test;
+package com.util.recyclerview;
 
 import android.content.Context;
-import android.widget.ImageView;
-import android.widget.TextView;
-import com.example.qgrecyclerview.R.id;
-import com.example.qgrecyclerview.R.layout;
+import android.util.AttributeSet;
 import org.androidannotations.api.view.HasViews;
-import org.androidannotations.api.view.OnViewChangedListener;
 import org.androidannotations.api.view.OnViewChangedNotifier;
 
 
@@ -24,21 +20,26 @@ import org.androidannotations.api.view.OnViewChangedNotifier;
  * 
  */
 @SuppressWarnings("unused")
-public final class MyViewGroup2_
-    extends MyViewGroup2
-    implements HasViews, OnViewChangedListener
+public final class SwipeView_
+    extends SwipeView
+    implements HasViews
 {
 
     private boolean alreadyInflated_ = false;
     private final OnViewChangedNotifier onViewChangedNotifier_ = new OnViewChangedNotifier();
 
-    public MyViewGroup2_(Context context) {
+    public SwipeView_(Context context) {
         super(context);
         init_();
     }
 
-    public static MyViewGroup2 build(Context context) {
-        MyViewGroup2_ instance = new MyViewGroup2_(context);
+    public SwipeView_(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init_();
+    }
+
+    public static SwipeView build(Context context) {
+        SwipeView_ instance = new SwipeView_(context);
         instance.onFinishInflate();
         return instance;
     }
@@ -54,7 +55,6 @@ public final class MyViewGroup2_
     public void onFinishInflate() {
         if (!alreadyInflated_) {
             alreadyInflated_ = true;
-            inflate(getContext(), layout.bean_layout2, this);
             onViewChangedNotifier_.notifyViewChanged(this);
         }
         super.onFinishInflate();
@@ -62,15 +62,13 @@ public final class MyViewGroup2_
 
     private void init_() {
         OnViewChangedNotifier previousNotifier = OnViewChangedNotifier.replaceNotifier(onViewChangedNotifier_);
-        OnViewChangedNotifier.registerOnViewChangedListener(this);
         OnViewChangedNotifier.replaceNotifier(previousNotifier);
     }
 
-    @Override
-    public void onViewChanged(HasViews hasViews) {
-        beanIv = ((ImageView) hasViews.findViewById(id.vg2_image));
-        Vg2Content = ((TextView) hasViews.findViewById(id.vg2_content));
-        vg2Title = ((TextView) hasViews.findViewById(id.vg2_title));
+    public static SwipeView build(Context context, AttributeSet attrs) {
+        SwipeView_ instance = new SwipeView_(context, attrs);
+        instance.onFinishInflate();
+        return instance;
     }
 
 }

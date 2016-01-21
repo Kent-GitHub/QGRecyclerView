@@ -6,9 +6,12 @@
 
 package com.example.recyclerview.test;
 
+import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,19 +20,20 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import com.example.qgrecyclerview.R.id;
 import com.example.qgrecyclerview.R.layout;
-import com.util.recyclerview.CustomRecyclerView;
+import com.util.recyclerview.SwipeView;
 import org.androidannotations.api.BackgroundExecutor;
 import org.androidannotations.api.builder.ActivityIntentBuilder;
 import org.androidannotations.api.view.HasViews;
 import org.androidannotations.api.view.OnViewChangedListener;
 import org.androidannotations.api.view.OnViewChangedNotifier;
 
-public final class TestActivity_
-    extends TestActivity
+public final class SwipeTestActy_
+    extends SwipeTestActy
     implements HasViews, OnViewChangedListener
 {
 
     private final OnViewChangedNotifier onViewChangedNotifier_ = new OnViewChangedNotifier();
+    private Handler handler_ = new Handler(Looper.getMainLooper());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,7 @@ public final class TestActivity_
         init_(savedInstanceState);
         super.onCreate(savedInstanceState);
         OnViewChangedNotifier.replaceNotifier(previousNotifier);
-        setContentView(layout.test_acty_layout);
+        setContentView(layout.swipe_test_layout);
     }
 
     private void init_(Bundle savedInstanceState) {
@@ -62,30 +66,30 @@ public final class TestActivity_
         onViewChangedNotifier_.notifyViewChanged(this);
     }
 
-    public static TestActivity_.IntentBuilder_ intent(Context context) {
-        return new TestActivity_.IntentBuilder_(context);
+    public static SwipeTestActy_.IntentBuilder_ intent(Context context) {
+        return new SwipeTestActy_.IntentBuilder_(context);
     }
 
-    public static TestActivity_.IntentBuilder_ intent(android.app.Fragment fragment) {
-        return new TestActivity_.IntentBuilder_(fragment);
+    public static SwipeTestActy_.IntentBuilder_ intent(android.app.Fragment fragment) {
+        return new SwipeTestActy_.IntentBuilder_(fragment);
     }
 
-    public static TestActivity_.IntentBuilder_ intent(android.support.v4.app.Fragment supportFragment) {
-        return new TestActivity_.IntentBuilder_(supportFragment);
+    public static SwipeTestActy_.IntentBuilder_ intent(android.support.v4.app.Fragment supportFragment) {
+        return new SwipeTestActy_.IntentBuilder_(supportFragment);
     }
 
     @Override
     public void onViewChanged(HasViews hasViews) {
-        mRecyclerView = ((CustomRecyclerView) hasViews.findViewById(id.test_recyclerview));
+        mSwipeView = ((SwipeView) hasViews.findViewById(id.swipe_test_swipeView));
         {
-            View view = hasViews.findViewById(id.btn_1);
+            View view = hasViews.findViewById(id.s_btn_1);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        TestActivity_.this.onClick(view);
+                        SwipeTestActy_.this.onClick(view);
                     }
 
                 }
@@ -93,14 +97,14 @@ public final class TestActivity_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_2);
+            View view = hasViews.findViewById(id.s_btn_2);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        TestActivity_.this.onClick(view);
+                        SwipeTestActy_.this.onClick(view);
                     }
 
                 }
@@ -108,14 +112,14 @@ public final class TestActivity_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_add_header);
+            View view = hasViews.findViewById(id.s_btn_add_header);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        TestActivity_.this.onClick(view);
+                        SwipeTestActy_.this.onClick(view);
                     }
 
                 }
@@ -123,14 +127,14 @@ public final class TestActivity_
             }
         }
         {
-            View view = hasViews.findViewById(id.btn_add_footer);
+            View view = hasViews.findViewById(id.s_btn_add_footer);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        TestActivity_.this.onClick(view);
+                        SwipeTestActy_.this.onClick(view);
                     }
 
                 }
@@ -138,14 +142,14 @@ public final class TestActivity_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state1));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state1));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        TestActivity_.this.checkChanged(buttonView, isChecked);
+                        SwipeTestActy_.this.checkChanged(buttonView, isChecked);
                     }
 
                 }
@@ -153,14 +157,14 @@ public final class TestActivity_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state2));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state2));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        TestActivity_.this.checkChanged(buttonView, isChecked);
+                        SwipeTestActy_.this.checkChanged(buttonView, isChecked);
                     }
 
                 }
@@ -168,14 +172,14 @@ public final class TestActivity_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_state3));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_state3));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        TestActivity_.this.checkChanged(buttonView, isChecked);
+                        SwipeTestActy_.this.checkChanged(buttonView, isChecked);
                     }
 
                 }
@@ -183,14 +187,14 @@ public final class TestActivity_
             }
         }
         {
-            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.test_auto_load));
+            CompoundButton view = ((CompoundButton) hasViews.findViewById(id.s_test_auto_load));
             if (view!= null) {
                 view.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        TestActivity_.this.checkChanged(buttonView, isChecked);
+                        SwipeTestActy_.this.checkChanged(buttonView, isChecked);
                     }
 
                 }
@@ -201,6 +205,52 @@ public final class TestActivity_
     }
 
     @Override
+    public void addDatas(final List<MyBean> dataList) {
+        handler_.post(new Runnable() {
+
+
+            @Override
+            public void run() {
+                SwipeTestActy_.super.addDatas(dataList);
+            }
+
+        }
+        );
+    }
+
+    @Override
+    public void onRefreshFinish() {
+        handler_.post(new Runnable() {
+
+
+            @Override
+            public void run() {
+                SwipeTestActy_.super.onRefreshFinish();
+            }
+
+        }
+        );
+    }
+
+    @Override
+    public void onRecyclerViewRefresh() {
+        BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
+
+
+            @Override
+            public void execute() {
+                try {
+                    SwipeTestActy_.super.onRecyclerViewRefresh();
+                } catch (Throwable e) {
+                    Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+                }
+            }
+
+        }
+        );
+    }
+
+    @Override
     public void loadMoreDatas() {
         BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
 
@@ -208,7 +258,7 @@ public final class TestActivity_
             @Override
             public void execute() {
                 try {
-                    TestActivity_.super.loadMoreDatas();
+                    SwipeTestActy_.super.loadMoreDatas();
                 } catch (Throwable e) {
                     Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                 }
@@ -219,23 +269,23 @@ public final class TestActivity_
     }
 
     public static class IntentBuilder_
-        extends ActivityIntentBuilder<TestActivity_.IntentBuilder_>
+        extends ActivityIntentBuilder<SwipeTestActy_.IntentBuilder_>
     {
 
         private android.app.Fragment fragment_;
         private android.support.v4.app.Fragment fragmentSupport_;
 
         public IntentBuilder_(Context context) {
-            super(context, TestActivity_.class);
+            super(context, SwipeTestActy_.class);
         }
 
         public IntentBuilder_(android.app.Fragment fragment) {
-            super(fragment.getActivity(), TestActivity_.class);
+            super(fragment.getActivity(), SwipeTestActy_.class);
             fragment_ = fragment;
         }
 
         public IntentBuilder_(android.support.v4.app.Fragment fragment) {
-            super(fragment.getActivity(), TestActivity_.class);
+            super(fragment.getActivity(), SwipeTestActy_.class);
             fragmentSupport_ = fragment;
         }
 

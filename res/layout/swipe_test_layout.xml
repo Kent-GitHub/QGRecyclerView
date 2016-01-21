@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <com.util.recyclerview.SwipeView
+        android:id="@+id/swipe_test_swipeView"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent">
+        
+    </com.util.recyclerview.SwipeView>
+    
+    <LinearLayout 
+        android:layout_height="35dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <RadioGroup 
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:orientation="horizontal">
+            <RadioButton 
+                android:id="@+id/s_test_state1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="成功"
+                android:checked="true"/>
+            <RadioButton 
+                android:id="@+id/s_test_state2"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="失败"/>
+            <RadioButton 
+                android:id="@+id/s_test_state3"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="无数据"/>
+        </RadioGroup>
+        <CheckBox 
+            android:id="@+id/s_test_auto_load"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="自动加载"/>
+    </LinearLayout>
+    <LinearLayout 
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+        <Button 
+            android:id="@+id/s_btn_1"
+            android:text="Method1"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+		<Button 
+            android:id="@+id/s_btn_2"
+            android:text="Method2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+		<Button 
+            android:id="@+id/s_btn_add_header"
+            android:text="Header"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+		<Button 
+		    android:id="@+id/s_btn_add_footer"
+		    android:text="Footer"
+		    android:layout_height="wrap_content"
+		    android:layout_width="0dp"
+		    android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>
