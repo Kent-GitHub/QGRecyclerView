@@ -32,7 +32,7 @@ public class CustomRecyclerView extends RecyclerView implements
 
 	private Context mContext;
 	/**
-	 * 分隔符实例
+	 * 分割线实例
 	 */
 	private ItemDecoration mItemDecoration;
 
