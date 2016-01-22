@@ -163,6 +163,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	public void setOnSubItemClickListener(int subViewId,
 			OnSubItemCLickListener listener) {
+		this.addOnItemTouchListener(mOnItemTouchListener);
 		mSubViewId = subViewId;
 		mOnSubItemCLickListener = listener;
 	}
@@ -265,11 +266,9 @@ public class CustomRecyclerView extends RecyclerView implements
 	public void setOnLoadMoreListener(OnLoadMoreListener listener) {
 		mOnLoadMoreListener = listener;
 		getDefaultLoadStateView();
-		// listener不为空则为adapter传递LoadStateView
 		if (listener != null && getAdapter() != null) {
 			getMyAdapter().setLoadStateView(mLoadStateView);
 		} else if (listener == null) {
-			// listener为空
 			mLoadStateView = null;
 			if (getAdapter() != null) {
 				getMyAdapter().setLoadStateView(null);
@@ -320,12 +319,14 @@ public class CustomRecyclerView extends RecyclerView implements
 	public void setAdapter(Adapter adapter) {
 		super.setAdapter(adapter);
 		ReViewAdapter myAdapter = getMyAdapter();
-		myAdapter.setRecyclerView(this);
-		myAdapter.setOnItemSelectedListener(mOnItemSelectedListener,
-				selectedEffectEnable, selectedColor, unSelectedColor);
-		myAdapter.setFooterView(mFooterView);
-		myAdapter.setHeaderView(mHeaderView);
-		myAdapter.setLoadStateView(mLoadStateView);
+		if (myAdapter!=null) {
+			myAdapter.setRecyclerView(this);
+			myAdapter.setOnItemSelectedListener(mOnItemSelectedListener,
+					selectedEffectEnable, selectedColor, unSelectedColor);
+			myAdapter.setFooterView(mFooterView);
+			myAdapter.setHeaderView(mHeaderView);
+			myAdapter.setLoadStateView(mLoadStateView);
+		}
 	}
 
 	/**
@@ -518,8 +519,10 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	private void loadStarted() {
 		isLoadingMore = true;
-		mLoadStateView.setLoadingStateText("正在加载中");
-		mLoadStateView.showProgressBar();
+		if (mLoadStateView!=null) {
+			mLoadStateView.setLoadingStateText("正在加载中");
+			mLoadStateView.showProgressBar();
+		}
 	}
 
 	/**
@@ -527,8 +530,10 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	public void succeeded() {
 		isLoadingMore = false;
-		mLoadStateView.hideProgressBar();
-		mLoadStateView.setLoadingStateText("点击加载更多");
+		if (mLoadStateView!=null) {
+			mLoadStateView.hideProgressBar();
+			mLoadStateView.setLoadingStateText("点击加载更多");
+		}
 	}
 
 	/**
@@ -536,16 +541,20 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	public void failed() {
 		isLoadingMore = false;
-		mLoadStateView.hideProgressBar();
-		mLoadStateView.setLoadingStateText("加载失败，点击重试");
+		if (mLoadStateView!=null) {
+			mLoadStateView.hideProgressBar();
+			mLoadStateView.setLoadingStateText("加载失败，点击重试");
+		}
 	}
 
 	/**
 	 * 通知RecyclerView已无数据可以加载
 	 */
 	public void noMore() {
-		mLoadStateView.hideProgressBar();
-		mLoadStateView.setLoadingStateText("没有更多数据了");
+		if (mLoadStateView!=null) {
+			mLoadStateView.hideProgressBar();
+			mLoadStateView.setLoadingStateText("没有更多数据了");
+		}
 	}
 
 	/**
@@ -599,7 +608,6 @@ public class CustomRecyclerView extends RecyclerView implements
 				}
 			}
 		} else {
-
 			return view.getId();
 		}
 		return id;
@@ -616,7 +624,7 @@ public class CustomRecyclerView extends RecyclerView implements
 		try {
 			date = getMyAdapter().getDate(position);
 		} catch (Exception e) {
-
+			
 		}
 		return date;
 	}
@@ -702,12 +710,12 @@ public class CustomRecyclerView extends RecyclerView implements
 				@Override
 				public void onLongPress(MotionEvent e) {
 					super.onLongPress(e);
-					if (mOnItemLongClickListener != null) {
-						View view = findChildViewUnder(e.getX(), e.getY());
+					View view;
+					if (mOnItemLongClickListener != null&&
+							(view = findChildViewUnder(e.getX(), e.getY()))!=null) {
 						int position = getChildPosition(view);
 						int viewType = getMyAdapter().getItemViewType(position);
-						if (view != null
-								&& viewType != VIEW_TYPE_LOAD_STATE_VIEW
+						if (viewType != VIEW_TYPE_LOAD_STATE_VIEW
 								// 点击事件把HeaderView、FooterView排除在外，如果要加进去需要注意返回的data为null
 								&& viewType != VIEW_TYPE_HEADER
 								&& viewType != VIEW_TYPE_FOOTER) {
@@ -727,14 +735,12 @@ public class CustomRecyclerView extends RecyclerView implements
 				@Override
 				public boolean onScroll(MotionEvent e1, MotionEvent e2,
 						float distanceX, float distanceY) {
-					if (mOnItemLeftScrollListener != null
-							|| mOnItemRightScrollListener != null
-							&& isDirectionConfirm) {
-						View view = findChildViewUnder(e1.getX(), e1.getY());
+					View view;
+					if (isDirectionConfirm&&(view = findChildViewUnder(e1.getX(), e1.getY()))!=null
+							&&(mOnItemLeftScrollListener != null|| mOnItemRightScrollListener != null)) {
 						int viewType = getAdapter().getItemViewType(
 								getChildPosition(view));
-						if (view != null
-								&& viewType != VIEW_TYPE_LOAD_STATE_VIEW
+						if (viewType != VIEW_TYPE_LOAD_STATE_VIEW
 								&& viewType != VIEW_TYPE_HEADER
 								&& viewType != VIEW_TYPE_FOOTER) {
 							if (Math.abs(distanceX) > Math.abs(3 * distanceY)) {
@@ -782,7 +788,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	};
 
 	/**
-	 * implements OnItemTouchListener OnItemTouchListener监听事件实现的方法
+	 * implements OnItemTouchListener 监听事件实现的方法
 	 */
 	@Override
 	public boolean onInterceptTouchEvent(RecyclerView recyclerView,
@@ -805,7 +811,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
-	 * implements OnItemTouchListener OnItemTouchListener监听事件实现的方法
+	 * implements OnItemTouchListener 监听事件实现的方法
 	 */
 	@Override
 	public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {

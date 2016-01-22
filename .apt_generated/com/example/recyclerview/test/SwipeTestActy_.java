@@ -233,14 +233,14 @@ public final class SwipeTestActy_
     }
 
     @Override
-    public void loadMoreDatas() {
+    public void onRecyclerViewRefresh() {
         BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
 
 
             @Override
             public void execute() {
                 try {
-                    SwipeTestActy_.super.loadMoreDatas();
+                    SwipeTestActy_.super.onRecyclerViewRefresh();
                 } catch (Throwable e) {
                     Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                 }
@@ -251,14 +251,14 @@ public final class SwipeTestActy_
     }
 
     @Override
-    public void onRecyclerViewRefresh() {
+    public void loadMoreDatas() {
         BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
 
 
             @Override
             public void execute() {
                 try {
-                    SwipeTestActy_.super.onRecyclerViewRefresh();
+                    SwipeTestActy_.super.loadMoreDatas();
                 } catch (Throwable e) {
                     Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
                 }

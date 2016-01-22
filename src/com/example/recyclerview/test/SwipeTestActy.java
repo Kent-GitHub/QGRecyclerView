@@ -36,25 +36,26 @@ import com.util.recyclerview.CustomRecyclerView.OnLoadMoreListener;
 import com.util.recyclerview.CustomRecyclerView.OnSubItemCLickListener;
 import com.util.recyclerview.ReViewAdapter;
 import com.util.recyclerview.SwipeView;
+
 @EActivity(R.layout.swipe_test_layout)
-public class SwipeTestActy extends Activity{
+public class SwipeTestActy extends Activity {
 	private CustomRecyclerView mRecyclerView;
 	private List<MyBean> mDatas;
 	private Context mContext = SwipeTestActy.this;
 	private ReViewAdapter<MyBean> mAdapter;
-	
+
 	@ViewById(R.id.swipe_test_swipeView)
 	SwipeView mSwipeView;
-	
+
 	public final int STATE_SUCCEEDED = 1;
 	public final int STATE_FAILED = 2;
 	public final int STATE_NO_MORE_DATAS = 3;
-	
-	private int loadState;
-	private String logTag="SwipeTestActy";
 
-	@CheckedChange({ R.id.s_test_state1, R.id.s_test_state2, R.id.s_test_state3,
-			R.id.s_test_auto_load })
+	private int loadState;
+	private String logTag = "SwipeTestActy";
+
+	@CheckedChange({ R.id.s_test_state1, R.id.s_test_state2,
+			R.id.s_test_state3, R.id.s_test_auto_load })
 	void checkChanged(CompoundButton button, boolean isChecked) {
 		if (isChecked) {
 			switch (button.getId()) {
@@ -80,7 +81,8 @@ public class SwipeTestActy extends Activity{
 	public static final int TYPE_WITHOUT_BUTTON = 1;
 	public static final int TYPE_WITH_BUTTON = 2;
 
-	@Click({ R.id.s_btn_1, R.id.s_btn_2, R.id.s_btn_add_header, R.id.s_btn_add_footer })
+	@Click({ R.id.s_btn_1, R.id.s_btn_2, R.id.s_btn_add_header,
+			R.id.s_btn_add_footer })
 	void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.s_btn_1:
@@ -124,44 +126,44 @@ public class SwipeTestActy extends Activity{
 	@AfterViews
 	void afterViews() {
 		initDatas();
-		
 		mSwipeView.setOnRefreshListener(new OnRefreshListener() {
-			
+
 			@Override
 			public void onRefresh() {
 				onRecyclerViewRefresh();
 			}
 		});
-		
-		mRecyclerView=mSwipeView.getRecyclerView();
-		
+
+		mRecyclerView = mSwipeView.getRecyclerView();
+
 		mRecyclerView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(RecyclerView parent, View view,
 					int position, int id, Object data) {
-				Log.d(logTag, "Clicked position : " + position
-//						+ ", Title"+ ((MyBean)data).newsTitle + "."
-						);
+				Log.d(logTag, "Clicked position : " + position + ", Title"
+						+ ((MyBean) data).newsTitle + ".");
 			}
 		});
-		
-		mRecyclerView.setOnSubItemClickListener(R.id.vg1_btn, new OnSubItemCLickListener() {
-			
-			@Override
-			public void onSubItemClick(View view, Object data) {
-				if (view instanceof TextView) {
-					((Button) view).setText("Clicked");
-				}
-			}
-		});
-		
+
+		mRecyclerView.setOnSubItemClickListener(R.id.vg1_btn,
+				new OnSubItemCLickListener() {
+
+					@Override
+					public void onSubItemClick(View view, Object data) {
+						if (view instanceof TextView) {
+							((Button) view).setText("Clicked");
+						}
+					}
+				});
+
 		mRecyclerView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			@Override
 			public void onItemLongClick(RecyclerView parent, View view,
 					int position, int id, Object data) {
-				Log.d(logTag,"Long clicked position : " + position+ ".\nClicked child view ID:" + id + ".");
+				Log.d(logTag, "Long clicked position : " + position
+						+ ".\nClicked child view ID:" + id + ".");
 			}
 		});
 
@@ -176,17 +178,18 @@ public class SwipeTestActy extends Activity{
 
 			@Override
 			public void onNothingSelected(View lastView, int lastPosition) {
-//				Log.d(logTag, "nothing selected.  lastPosition : " + lastPosition);
+				// Log.d(logTag, "nothing selected.  lastPosition : " +
+				// lastPosition);
 			}
 
 			@Override
 			public void onItemUnselected(View view, int position, int type) {
-//				Log.d(logTag, "item unselected position : " + position);
+				// Log.d(logTag, "item unselected position : " + position);
 			}
 
 			@Override
 			public void onItemSelected(View view, int position, int type) {
-//				Log.d(logTag, "item selected position : " + position);
+				// Log.d(logTag, "item selected position : " + position);
 			}
 		}, true);
 
@@ -197,28 +200,35 @@ public class SwipeTestActy extends Activity{
 				loadMoreDatas();
 			}
 		});
-		
-		mRecyclerView.setOnItemLeftScrollListener(new OnItemLeftScrollListener() {
-			
-			@Override
-			public void onItemLeftScroll(View view, int position) {
-				Toast.makeText(mContext, "Item : "+position +" left scrolled", 0).show();
-				Log.d(logTag, "onItemLeftScroll : "+position +".");
-			}
-		});
-		
-		mRecyclerView.setOnItemRightScrollListener(new OnItemRightScrollListener() {
-			
-			@Override
-			public void onItemRightScroll(View view, int position) {
-				Toast.makeText(mContext, "Item : "+position +"right scrolled", 0).show();
-				Log.d(logTag, "onItemRightScroll : "+position +".");
-			}
-		});
-		
-		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0).setAutoLoadMoreEnable(false);
+
+		mRecyclerView
+				.setOnItemLeftScrollListener(new OnItemLeftScrollListener() {
+
+					@Override
+					public void onItemLeftScroll(View view, int position) {
+						Toast.makeText(mContext,
+								"Item : " + position + " left scrolled", 0)
+								.show();
+						Log.d(logTag, "onItemLeftScroll : " + position + ".");
+					}
+				});
+
+		mRecyclerView
+				.setOnItemRightScrollListener(new OnItemRightScrollListener() {
+
+					@Override
+					public void onItemRightScroll(View view, int position) {
+						Toast.makeText(mContext,
+								"Item : " + position + "right scrolled", 0)
+								.show();
+						Log.d(logTag, "onItemRightScroll : " + position + ".");
+					}
+				});
+
+		mRecyclerView.setItemDecoration(Color.parseColor("#dcdcdc"), 1, 0, 0)
+				.setAutoLoadMoreEnable(false);
 		// 设置加载状态Itemview显示的文字
-		 mRecyclerView.setLoadState("要显示的文字");
+		mRecyclerView.setLoadState("要显示的文字");
 	}
 
 	private void initDatas() {
@@ -246,29 +256,29 @@ public class SwipeTestActy extends Activity{
 					"新闻内容~~~~~~~~~~~~~~~~~~~" + i);
 			dataList.add(bean);
 		}
-		 addDatas(dataList);
+		addDatas(dataList);
 	}
-	
-	@Background 
-	void onRecyclerViewRefresh(){
+
+	@Background
+	void onRecyclerViewRefresh() {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		onRefreshFinish();
 	}
-	
+
 	@UiThread
-	void onRefreshFinish(){
-		Date date=new Date(System.currentTimeMillis());
-		MyBean bean=mDatas.get(0);
-		bean.newsContent=date.toString();
+	void onRefreshFinish() {
+		Date date = new Date(System.currentTimeMillis());
+		MyBean bean = mDatas.get(0);
+		bean.newsContent = date.toString();
 		mDatas.set(0, bean);
 		mRecyclerView.getAdapter().notifyDataSetChanged();
 		mSwipeView.setRefreshing(false);
 	}
-	
+
 	@UiThread
 	void addDatas(List<MyBean> dataList) {
 		switch (loadState) {
