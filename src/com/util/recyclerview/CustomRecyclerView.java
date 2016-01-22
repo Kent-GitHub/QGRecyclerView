@@ -66,10 +66,6 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	private OnItemRightScrollListener mOnItemRightScrollListener;
 	/**
-	 * 下拉刷新监听事件实例
-	 */
-	private OnRefreshListener mOnRefreshListener;
-	/**
 	 * RecyclerView加载更多监听事件实例
 	 */
 	private OnLoadMoreListener mOnLoadMoreListener;
@@ -82,7 +78,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	private int unSelectedColor = Color.parseColor("#00ffffff");
 	/**
-	 * 触发SubView点击事件的ViewID
+	 * 触发SubView点击事件的子view ID
 	 */
 	private int mSubViewId;
 	/**
@@ -99,7 +95,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	private boolean isAutoLoadMore = false;
 
 	/**
-	 * 手指按下时所在的View
+	 * 手指按下时所在的ItemView
 	 */
 	private View onTouchDownView;
 	/**
@@ -107,7 +103,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	 */
 	private float onTouchDownX;
 	/**
-	 * 标记判定左划右划事件中方向是否已经确定
+	 * 标记左划右划事件中方向是否已经确定
 	 */
 	private boolean isDirectionConfirm = false;
 	/**
@@ -118,15 +114,20 @@ public class CustomRecyclerView extends RecyclerView implements
 	 * 是否已确定为右划事件
 	 */
 	private boolean isHorizontalRightScroll = false;
+	/**
+	 * HeaderView
+	 */
 	private View mHeaderView;
-
+	/**
+	 * FooterView
+	 */
 	private View mFooterView;
 	/**
 	 * RecyclerView的ReViewAdapter
 	 */
 	private ReViewAdapter mAdapter;
 	/**
-	 *  在底部显示加载状态的ItemView
+	 * 在底部显示加载状态的ItemView
 	 */
 	private LoadStateView mLoadStateView;
 
@@ -248,7 +249,7 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
-	 * 设置ItemView右划监听监听
+	 * 设置ItemView右划监听事件
 	 * 
 	 * @param listener
 	 */
@@ -264,11 +265,15 @@ public class CustomRecyclerView extends RecyclerView implements
 	public void setOnLoadMoreListener(OnLoadMoreListener listener) {
 		mOnLoadMoreListener = listener;
 		getDefaultLoadStateView();
+		// listener不为空则为adapter传递LoadStateView
 		if (listener != null && getAdapter() != null) {
 			getMyAdapter().setLoadStateView(mLoadStateView);
-		} else if (listener == null && getAdapter() != null) {
+		} else if (listener == null) {
+			// listener为空
 			mLoadStateView = null;
-			getMyAdapter().setLoadStateView(null);
+			if (getAdapter() != null) {
+				getMyAdapter().setLoadStateView(null);
+			}
 		}
 	}
 
@@ -496,9 +501,10 @@ public class CustomRecyclerView extends RecyclerView implements
 	public interface OnItemRightScrollListener {
 		void onItemRightScroll(View view, int position);
 	}
+
 	/**
 	 * RecyclerView在底部时加载更多接口
-	 *
+	 * 
 	 */
 	public interface OnLoadMoreListener {
 		/**
@@ -543,24 +549,24 @@ public class CustomRecyclerView extends RecyclerView implements
 	}
 
 	/**
-	 * 初始化
-	 * 设置布局管理器--setLayoutManager(manager) 这里设置为竖直方向排布
+	 * 初始化 设置布局管理器--setLayoutManager(manager) 这里设置为竖直方向排布
 	 * 添加Item分隔符--addItemDecoration
 	 */
 	private void init(Context context) {
 		mContext = context;
 		LinearLayoutManager manager = new LinearLayoutManager(context,
 				LinearLayoutManager.VERTICAL, false);
-		//设置布局管理器
+		// 设置布局管理器
 		this.setLayoutManager(manager);
 		mItemDecoration = new HorizontalDividerItemDecoration.Builder(context)
 				.color(Color.parseColor("#dcdcdc")).size(2).margin(0, 0)
 				.build();
-		//设置默认的分割线
+		// 设置默认的分割线
 		this.addItemDecoration(mItemDecoration);
-		//设置滑动监听
+		// 设置滑动监听
 		this.setOnScrollListener(mScrollListener);
 	}
+
 	/**
 	 * 获得ReViewAdapter实例
 	 */
@@ -640,6 +646,7 @@ public class CustomRecyclerView extends RecyclerView implements
 		}
 		return false;
 	}
+
 	/**
 	 * mGestureDetector由OnItemTouchListener的方法调用并触发ItemView的点击事件、长按事件、左划右划事件
 	 */
@@ -649,7 +656,7 @@ public class CustomRecyclerView extends RecyclerView implements
 				 * 触发ItemView点击事件或SubView点击事件或者触发LoadStateView的点击加载更多
 				 */
 				@Override
-//				public boolean onSingleTapUp(MotionEvent e) {
+				// public boolean onSingleTapUp(MotionEvent e) {
 				public boolean onSingleTapConfirmed(MotionEvent e) {
 					View view = findChildViewUnder(e.getX(), e.getY());
 					if (view != null) {
@@ -718,15 +725,24 @@ public class CustomRecyclerView extends RecyclerView implements
 				 * 判定左划右划事件
 				 */
 				@Override
-				public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-					if (mOnItemLeftScrollListener != null || mOnItemRightScrollListener != null&&isDirectionConfirm) {
-						View view=findChildViewUnder(e1.getX(), e1.getY());
-						int viewType = getAdapter().getItemViewType(getChildPosition(view));
-						if (view != null && viewType != VIEW_TYPE_LOAD_STATE_VIEW && viewType != VIEW_TYPE_HEADER && viewType != VIEW_TYPE_FOOTER) {
-							if (Math.abs(distanceX) > Math .abs(3 * distanceY)) {
+				public boolean onScroll(MotionEvent e1, MotionEvent e2,
+						float distanceX, float distanceY) {
+					if (mOnItemLeftScrollListener != null
+							|| mOnItemRightScrollListener != null
+							&& isDirectionConfirm) {
+						View view = findChildViewUnder(e1.getX(), e1.getY());
+						int viewType = getAdapter().getItemViewType(
+								getChildPosition(view));
+						if (view != null
+								&& viewType != VIEW_TYPE_LOAD_STATE_VIEW
+								&& viewType != VIEW_TYPE_HEADER
+								&& viewType != VIEW_TYPE_FOOTER) {
+							if (Math.abs(distanceX) > Math.abs(3 * distanceY)) {
 								onTouchDownX = e1.getX();
-								onTouchDownView=findChildViewUnder(e1.getX(), e1.getY());
-								isHorizontalRightScroll = !(isHorizontalLeftScroll = e2 .getX() < e1.getX()); 
+								onTouchDownView = findChildViewUnder(e1.getX(),
+										e1.getY());
+								isHorizontalRightScroll = !(isHorizontalLeftScroll = e2
+										.getX() < e1.getX());
 							} else {
 								isHorizontalLeftScroll = false;
 								isHorizontalRightScroll = false;
@@ -758,20 +774,21 @@ public class CustomRecyclerView extends RecyclerView implements
 		 */
 		@Override
 		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-			if (mOnLoadMoreListener != null && isAutoLoadMore && isBottom()) {
+			if (!isLoadingMore && mOnLoadMoreListener != null && isAutoLoadMore && isBottom()) {
 				mOnLoadMoreListener.loadMore();
 				loadStarted();
 			}
 		}
 	};
+
 	/**
-	 * OnItemTouchListener监听事件实现的方法
+	 * implements OnItemTouchListener OnItemTouchListener监听事件实现的方法
 	 */
 	@Override
 	public boolean onInterceptTouchEvent(RecyclerView recyclerView,
 			MotionEvent event) {
-		//给mGestureDetector传递触摸事件
-		if (mAdapter!=null) {
+		// 给mGestureDetector传递触摸事件
+		if (mAdapter != null) {
 			mGestureDetector.onTouchEvent(event);
 		}
 		switch (event.getAction()) {
@@ -779,30 +796,33 @@ public class CustomRecyclerView extends RecyclerView implements
 			isDirectionConfirm = false;
 			break;
 		}
-		//如果方向为左划或者右划、禁止RecyclerView上下移动
-		if (isDirectionConfirm&&(isHorizontalLeftScroll || isHorizontalRightScroll)) {
+		// 如果方向为左划或者右划、禁止RecyclerView上下移动
+		if (isDirectionConfirm
+				&& (isHorizontalLeftScroll || isHorizontalRightScroll)) {
 			return true;
 		}
 		return false;
 	}
+
 	/**
-	 * OnItemTouchListener监听事件实现的方法
+	 * implements OnItemTouchListener OnItemTouchListener监听事件实现的方法
 	 */
 	@Override
 	public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_UP:
-			//触发左划右划事件
+			// 触发左划右划事件
 			View view = findChildViewUnder(event.getX(), event.getY());
 			int position = getChildPosition(view);
 			int fixPosition = position - (mHeaderView != null ? 1 : 0);
-			if (view!=null&&view==onTouchDownView&&isHorizontalLeftScroll && mOnItemLeftScrollListener != null
-					
+			if (view != null && view == onTouchDownView
+					&& isHorizontalLeftScroll
+					&& mOnItemLeftScrollListener != null
 					&& (onTouchDownX - event.getX()) > getWidth() / 3) {
 				mOnItemLeftScrollListener.onItemLeftScroll(view, fixPosition);
-			} else if (view!=null&&view==onTouchDownView&&isHorizontalRightScroll
+			} else if (view != null && view == onTouchDownView
+					&& isHorizontalRightScroll
 					&& mOnItemRightScrollListener != null
-					
 					&& (event.getX() - onTouchDownX) > getWidth() / 3) {
 				mOnItemRightScrollListener.onItemRightScroll(view, fixPosition);
 			}
